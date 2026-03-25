@@ -1,10 +1,3 @@
-//
-//  TaskManagerApp.swift
-//  TaskManager
-//
-//  Created by xpydr on 2026-03-25.
-//
-
 import SwiftUI
 import SwiftData
 
