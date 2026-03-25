@@ -6,6 +6,9 @@ struct TaskListView: View {
     @Query(sort: \Task.createdAt, order: .reverse) private var tasks: [Task]
     @State private var showAddTask = false
 
+    // Explicit init to avoid the synthesized private memberwise initializer
+    init() {}
+
     var body: some View {
         NavigationStack {
             Group {
@@ -22,6 +25,7 @@ struct TaskListView: View {
                         }
                         .onDelete(perform: deleteTasks)
                     }
+                    .listStyle(.plain)
                 }
             }
             .navigationTitle("Tasks")
