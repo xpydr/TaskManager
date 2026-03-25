@@ -5,7 +5,7 @@ import SwiftData
 struct TaskManagerApp: App {
     var body: some Scene {
         WindowGroup {
-            TaskListView()
+            MainTabView()
         }
         .modelContainer(for: Task.self)
     }
