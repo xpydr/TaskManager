@@ -2,14 +2,18 @@ import Foundation
 import SwiftData
 
 @Model
-final class Task {
+class Task {
     var title: String
-    var isCompleted: Bool
-    var createdAt: Date
-
-    init(title: String, isCompleted: Bool = false, createdAt: Date = .now) {
+    var category: String
+    var status: String
+    var dueDate: Date
+    var notes: String?
+    
+    init(title: String, category: String = "Work", status: String = "To Do", dueDate: Date, notes: String? = nil) {
         self.title = title
-        self.isCompleted = isCompleted
-        self.createdAt = createdAt
+        self.category = category
+        self.status = status
+        self.dueDate = dueDate
+        self.notes = notes
     }
 }
