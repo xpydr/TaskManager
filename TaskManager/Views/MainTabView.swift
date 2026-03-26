@@ -9,41 +9,42 @@ struct MainTabView: View {
     @State private var selectedTab: Tab = .tasks
     @State private var showAddTask: Bool = false
 
+    init() {
+        // Completely hide system TabBar (prevents double bar)
+        UITabBar.appearance().isHidden = true
+    }
+
     var body: some View {
-        TabView(selection: $selectedTab) {
-            TaskListView()
-                .tabItem {
-                    Label("Tasks", systemImage: "list.bullet")
-                }
-                .tag(Tab.tasks)
+        ZStack {
+            // MARK: - Main Content
+            TabView(selection: $selectedTab) {
+                TaskListView()
+                    .tag(Tab.tasks)
 
-            CalendarPlaceholderView()
-                .tabItem {
-                    Label("Calendar", systemImage: "calendar")
-                }
-                .tag(Tab.calendar)
+                CalendarPlaceholderView()
+                    .tag(Tab.calendar)
 
-            ProfileView()
-                .tabItem {
-                    Label("Profile", systemImage: "person")
-                }
-                .tag(Tab.profile)
+                ProfileView()
+                    .tag(Tab.profile)
 
-            CompletedView()
-                .tabItem {
-                    Label("Completed", systemImage: "checkmark")
-                }
-                .tag(Tab.completed)
-        }
-        .toolbar(.hidden, for: .tabBar)
-        .safeAreaInset(edge: .bottom) {
-            customTabBar
+                CompletedView()
+                    .tag(Tab.completed)
+            }
+
+            // MARK: - Custom Tab Bar Overlay
+            VStack {
+                Spacer()
+                customTabBar
+            }
         }
         .sheet(isPresented: $showAddTask) {
-            AddTaskView()
+            NavigationStack {
+                AddTaskView()
+            }
         }
     }
 
+    // MARK: - Custom Tab Bar
     private var customTabBar: some View {
         HStack {
             tabItem(icon: "list.bullet", title: "Tasks", tab: .tasks)
@@ -91,6 +92,7 @@ struct MainTabView: View {
         .background(Color.clear)
     }
 
+    // MARK: - Tab Item
     private func tabItem(icon: String, title: String, tab: Tab) -> some View {
         let isActive = selectedTab == tab
 
@@ -100,17 +102,26 @@ struct MainTabView: View {
             VStack(spacing: 2) {
                 Image(systemName: icon)
                     .font(.system(size: 17, weight: .medium))
-                    .foregroundStyle(isActive ? Color(red: 0.29, green: 0.44, blue: 0.68) : Color(red: 0.61, green: 0.63, blue: 0.68))
+                    .foregroundStyle(
+                        isActive
+                        ? Color(red: 0.29, green: 0.44, blue: 0.68)
+                        : Color(red: 0.61, green: 0.63, blue: 0.68)
+                    )
 
                 Text(title)
                     .font(.system(size: 8, weight: .medium, design: .rounded))
-                    .foregroundStyle(isActive ? Color(red: 0.29, green: 0.44, blue: 0.68) : Color(red: 0.56, green: 0.58, blue: 0.62))
+                    .foregroundStyle(
+                        isActive
+                        ? Color(red: 0.29, green: 0.44, blue: 0.68)
+                        : Color(red: 0.56, green: 0.58, blue: 0.62)
+                    )
             }
         }
         .buttonStyle(.plain)
     }
 }
 
+// MARK: - Calendar Placeholder
 private struct CalendarPlaceholderView: View {
     var body: some View {
         NavigationStack {
@@ -124,6 +135,7 @@ private struct CalendarPlaceholderView: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     MainTabView()
         .modelContainer(for: Task.self, inMemory: true)
