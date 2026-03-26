@@ -23,36 +23,36 @@ struct AddTaskView: View {
     let statuses = ["To Do", "In Progress", "Done"]
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color(UIColor.systemGroupedBackground)
-                    .ignoresSafeArea()
+        GeometryReader { geometry in
+            let metrics = AddTaskMetrics(width: geometry.size.width)
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Header
-                        HStack {
-                            Button("Cancel") {
-                                dismiss()
+            NavigationStack {
+                ZStack {
+                    Color(UIColor.systemGroupedBackground)
+                        .ignoresSafeArea()
+
+                    ScrollView {
+                        VStack(spacing: metrics.stackSpacing) {
+                            HStack {
+                                Button("Cancel") {
+                                    dismiss()
+                                }
+                                .foregroundColor(.blue)
+
+                                Spacer()
+
+                                Text("New Task")
+                                    .font(.system(size: metrics.titleSize, weight: .semibold, design: .rounded))
+
+                                Spacer()
+
+                                Text("Save")
+                                    .foregroundColor(.clear)
                             }
-                            .foregroundColor(.blue)
+                            .padding(.horizontal, metrics.horizontalPadding)
+                            .padding(.top, metrics.topPadding)
 
-                            Spacer()
-
-                            Text("New Task")
-                                .font(.title2)
-                                .fontWeight(.semibold)
-
-                            Spacer()
-
-                            // Placeholder for balance
-                            Text("Save")
-                                .foregroundColor(.clear)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-
-                        VStack(alignment: .leading, spacing: 20) {
+                            VStack(alignment: .leading, spacing: metrics.sectionSpacing) {
                             
                             // Title
                             VStack(alignment: .leading, spacing: 8) {
@@ -71,19 +71,19 @@ struct AddTaskView: View {
 
                                 HStack(spacing: 12) {
                                     ForEach(categories, id: \.self) { category in
-                                        CategoryButton(title: category, isSelected: selectedCategory == category) {
+                                        CategoryButton(title: category, isSelected: selectedCategory == category, metrics: metrics) {
                                             selectedCategory = category
                                         }
                                     }
                                     Button(action: {}) {
                                         Text("+ New")
-                                            .font(.subheadline)
+                                            .font(.system(size: metrics.buttonLabelSize, weight: .medium, design: .rounded))
                                             .fontWeight(.medium)
-                                            .padding(.horizontal, 16)
-                                            .padding(.vertical, 8)
+                                            .padding(.horizontal, metrics.pillHorizontal)
+                                            .padding(.vertical, metrics.pillVertical)
                                             .background(Color.gray.opacity(0.15))
                                             .foregroundColor(.secondary)
-                                            .cornerRadius(20)
+                                            .cornerRadius(metrics.pillCorner)
                                     }
                                 }
                             }
@@ -96,7 +96,7 @@ struct AddTaskView: View {
 
                                 HStack(spacing: 12) {
                                     ForEach(statuses, id: \.self) { status in
-                                        StatusButton(title: status, isSelected: selectedStatus == status) {
+                                        StatusButton(title: status, isSelected: selectedStatus == status, metrics: metrics) {
                                             selectedStatus = status
                                         }
                                     }
@@ -120,9 +120,9 @@ struct AddTaskView: View {
                                 }
                                 .padding()
                                 .background(Color.white)
-                                .cornerRadius(12)
+                                .cornerRadius(metrics.inputCorner)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
+                                    RoundedRectangle(cornerRadius: metrics.inputCorner)
                                         .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                                 )
                                 .overlay {
@@ -144,17 +144,17 @@ struct AddTaskView: View {
                                     .foregroundColor(.secondary)
 
                                 TextEditor(text: $notes)
-                                    .frame(height: 120)
+                                    .frame(height: metrics.notesHeight)
                                     .padding(8)
                                     .background(Color.white)
-                                    .cornerRadius(12)
+                                    .cornerRadius(metrics.inputCorner)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
+                                        RoundedRectangle(cornerRadius: metrics.inputCorner)
                                             .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                                     )
                             }
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, metrics.horizontalPadding)
 
                         // Create Button
                         Button(action: save) {
@@ -162,23 +162,23 @@ struct AddTaskView: View {
                                 Image(systemName: "plus")
                                     .font(.title3)
                                 Text("Create")
-                                    .font(.headline)
+                                    .font(.system(size: metrics.buttonTextSize, weight: .semibold, design: .rounded))
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
+                            .padding(.vertical, metrics.createButtonVertical)
                             .background(canSave ? Color.blue : Color.gray.opacity(0.6))
-                            .cornerRadius(16)
+                            .cornerRadius(metrics.createButtonCorner)
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, metrics.horizontalPadding)
                         .padding(.top, 12)
                         .disabled(!canSave)
 
-                        Spacer(minLength: 40)
+                        Spacer(minLength: metrics.bottomSpacer)
                     }
                 }
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)  // Custom header instead of navigationTitle
         }
     }
 
@@ -198,25 +198,53 @@ struct AddTaskView: View {
     }
 }
 
+private struct AddTaskMetrics {
+    let width: CGFloat
+
+    var compact: Bool { width < 360 }
+    var regular: Bool { width > 410 }
+
+    var horizontalPadding: CGFloat { compact ? 14 : 16 }
+    var topPadding: CGFloat { compact ? 6 : 8 }
+    var stackSpacing: CGFloat { compact ? 20 : 24 }
+    var sectionSpacing: CGFloat { compact ? 16 : 20 }
+
+    var titleSize: CGFloat { compact ? 21 : 23 }
+    var buttonLabelSize: CGFloat { compact ? 13 : 14 }
+    var buttonTextSize: CGFloat { compact ? 16 : 17 }
+
+    var inputCorner: CGFloat { compact ? 10 : 12 }
+    var notesHeight: CGFloat { compact ? 110 : 120 }
+
+    var pillHorizontal: CGFloat { compact ? 12 : 16 }
+    var pillVertical: CGFloat { compact ? 7 : 8 }
+    var pillCorner: CGFloat { compact ? 18 : 20 }
+
+    var createButtonVertical: CGFloat { compact ? 14 : 16 }
+    var createButtonCorner: CGFloat { compact ? 14 : 16 }
+    var bottomSpacer: CGFloat { compact ? 24 : 40 }
+}
+
 // MARK: - Reusable Selection Buttons
 
 struct CategoryButton: View {
     let title: String
     let isSelected: Bool
+    let metrics: AddTaskMetrics
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
+                .font(.system(size: metrics.buttonLabelSize, weight: .medium, design: .rounded))
                 .fontWeight(.medium)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
+                .padding(.horizontal, metrics.pillHorizontal)
+                .padding(.vertical, metrics.pillVertical)
                 .background(isSelected ? Color.blue : Color.white)
                 .foregroundColor(isSelected ? .white : .primary)
-                .cornerRadius(20)
+                .cornerRadius(metrics.pillCorner)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: metrics.pillCorner)
                         .stroke(isSelected ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
                 )
         }
@@ -226,20 +254,21 @@ struct CategoryButton: View {
 struct StatusButton: View {
     let title: String
     let isSelected: Bool
+    let metrics: AddTaskMetrics
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline)
+                .font(.system(size: metrics.buttonLabelSize, weight: .medium, design: .rounded))
                 .fontWeight(.medium)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
+                .padding(.horizontal, metrics.pillHorizontal)
+                .padding(.vertical, metrics.pillVertical)
                 .background(isSelected ? Color.blue : Color.white)
                 .foregroundColor(isSelected ? .white : .primary)
-                .cornerRadius(20)
+                .cornerRadius(metrics.pillCorner)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: metrics.pillCorner)
                         .stroke(isSelected ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
                 )
         }
