@@ -31,7 +31,7 @@ struct MainTabView: View {
                 }
                 .tag(Tab.create)
 
-            ProfilePlaceholderView()
+            ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person")
                 }
@@ -67,19 +67,6 @@ private struct CalendarPlaceholderView: View {
                 description: Text("Calendar view coming soon.")
             )
             .navigationTitle("Calendar")
-        }
-    }
-}
-
-private struct ProfilePlaceholderView: View {
-    var body: some View {
-        NavigationStack {
-            ContentUnavailableView(
-                "Profile",
-                systemImage: "person",
-                description: Text("Profile view coming soon.")
-            )
-            .navigationTitle("Profile")
         }
     }
 }
