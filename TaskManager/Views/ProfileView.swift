@@ -3,6 +3,8 @@ import SwiftData
 
 struct ProfileView: View {
     
+    @State private var showEditProfile = false
+    
     @Query(sort: \Task.createdAt, order: .reverse)
     private var tasks: [Task]
     
@@ -70,6 +72,7 @@ struct ProfileView: View {
                             .foregroundStyle(textGray)
                         
                         Button("Edit Profile") {
+                            showEditProfile = true
                         }
                         .padding()
                         .frame(maxWidth: 250)
@@ -110,6 +113,9 @@ struct ProfileView: View {
            
             }
             .navigationTitle("Profile")
+            .sheet(isPresented: $showEditProfile) {
+                EditProfileView()
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: 24)
                     .stroke(Color.gray.opacity(0.3), lineWidth: 2)
