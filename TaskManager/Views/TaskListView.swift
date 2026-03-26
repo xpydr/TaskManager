@@ -136,7 +136,7 @@ struct TaskListView: View {
                     }
                 )
 
-            Text("User Name")
+            Text("John Doe")
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)

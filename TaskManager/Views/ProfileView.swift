@@ -6,6 +6,13 @@ struct ProfileView: View {
     @Query(sort: \Task.createdAt, order: .reverse)
     private var tasks: [Task]
     
+    private let backgroundColor = Color(red: 1.0, green: 0.988, blue: 0.953)
+    private let outlineColor = Color(red: 0.84, green: 0.86, blue: 0.93)
+    private let shellBorderColor = Color(red: 0.93, green: 0.91, blue: 0.86)
+    private let primaryBlue = Color(red: 0.18, green: 0.39, blue: 0.70)
+    private let softBlue = Color(red: 0.84, green: 0.91, blue: 1.00)
+    private let textGray = Color(red: 0.42, green: 0.42, blue: 0.42)
+    
     // Stats
     
     var inProgressCount: Int {
@@ -22,90 +29,164 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
+            ZStack {
                 
-                VStack(spacing: 16) {
+                backgroundColor.ignoresSafeArea()
+                
+                VStack {
                     
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 120, height: 120)
-                        .foregroundColor(.blue)
-                    
-                    Text("John Doe")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("john@georgebrown.ca")
-                        .foregroundColor(.gray)
-                    
-                    Button("Edit Profile") {
-                      
+                    VStack(spacing: 16) {
+                        
+                        // Profile Icon
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color(red: 0.38, green: 0.67, blue: 1.0),
+                                        Color(red: 0.16, green: 0.33, blue: 0.67)
+                                    ],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 120, height: 120)
+                            .overlay(
+                                VStack(spacing: 6) {
+                                    Circle()
+                                        .fill(Color(red: 0.12, green: 0.31, blue: 0.57))
+                                        .frame(width: 28, height: 28)
+                                    
+                                    Capsule()
+                                        .fill(Color(red: 0.12, green: 0.31, blue: 0.57))
+                                        .frame(width: 60, height: 28)
+                                }
+                            )
+                        
+                        Text("John Doe")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundStyle(primaryBlue)
+                        
+                        Text("john@georgebrown.ca")
+                            .foregroundStyle(textGray)
+                        
+                        Button("Edit Profile") {
+                        }
+                        .padding()
+                        .frame(maxWidth: 250)
+                        .background(primaryBlue)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                        
+                        // Stats
+                        HStack(spacing: 16) {
+                            StatBox(
+                                number: "\(inProgressCount)",
+                                label: "In Progress",
+                                primaryBlue: primaryBlue,
+                                outlineColor: outlineColor,
+                                textGray: textGray
+                            )
+                            StatBox(
+                                number: "\(completedCount)",
+                                label: "Completed",
+                                primaryBlue: primaryBlue,
+                                outlineColor: outlineColor,
+                                textGray: textGray
+                            )
+                            StatBox(
+                                number: "\(todoCount)",
+                                label: "To Do",
+                                primaryBlue: primaryBlue,
+                                outlineColor: outlineColor,
+                                textGray: textGray
+                            )
+                        }
                     }
                     .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
+                    .padding(.top, 40)
                     
-                    // Stats
-                    
-                    HStack(spacing: 16) {
-                        StatBox(number: "\(inProgressCount)", label: "In Progress")
-                        StatBox(number: "\(completedCount)", label: "Completed")
-                        StatBox(number: "\(todoCount)", label: "To Do")
-                    }
+                    Spacer()
                 }
-                .padding()
-                .padding(.top, 40)
-                Spacer()
+           
             }
             .navigationTitle("Profile")
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
+                    .padding(16)
+                 
+            )
         }
     }
 }
 
-// MARK: - Reusable Stat Box
+// MARK: - Stat Box
 
 struct StatBox: View {
     let number: String
     let label: String
     
+    let primaryBlue: Color
+    let outlineColor: Color
+    let textGray: Color
+    
     var iconName: String {
         switch label {
         case "In Progress": return "clock.fill"
-        case "Completed": return "checkmark.circle.fill"
+        case "Completed": return "checkmark"
         case "To Do": return "tray.fill"
         default: return "square"
         }
     }
     
-    var iconColor: Color {
+    var iconBackgroundColor: Color {
         switch label {
-        case "In Progress": return .blue
-        case "Completed": return .green
-        case "To Do": return .gray
-        default: return .gray
+        case "In Progress": return Color(red: 0.86, green: 0.93, blue: 0.95)
+        case "Completed": return Color(red: 0.90, green: 0.95, blue: 0.90)
+        case "To Do": return Color(red: 0.90, green: 0.90, blue: 0.90)
+        default: return Color.gray.opacity(0.2)
+        }
+    }
+    
+    var iconForegroundColor: Color {
+        switch label {
+        case "In Progress": return Color(red: 0.40, green: 0.60, blue: 0.70)
+        case "Completed": return Color(red: 0.45, green: 0.70, blue: 0.50)
+        case "To Do": return Color.gray
+        default: return Color.gray
         }
     }
     
     var body: some View {
         VStack(spacing: 8) {
             
-            Image(systemName: iconName)
-                .font(.title2)
-                .foregroundColor(iconColor)
+            ZStack {
+                Circle()
+                    .fill(iconBackgroundColor)
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: iconName)
+                    .foregroundColor(iconForegroundColor)
+                    .font(.system(size: 18, weight: .semibold))
+            }
             
             Text(number)
-                .font(.headline)
-                .fontWeight(.bold)
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(primaryBlue)
             
             Text(label)
-                .font(.caption)
-                .foregroundColor(.gray)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(textGray)
         }
-        .frame(width: 100, height: 100)
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .frame(width: 100, height: 110)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.4))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(outlineColor, lineWidth: 1)
+                )
+        )
     }
 }
 
