@@ -29,7 +29,7 @@ struct MainTabView: View {
                 }
                 .tag(Tab.profile)
 
-            CompletedTasksView()
+            CompletedView()
                 .tabItem {
                     Label("Completed", systemImage: "checkmark")
                 }
@@ -120,46 +120,6 @@ private struct CalendarPlaceholderView: View {
                 description: Text("Calendar view coming soon.")
             )
             .navigationTitle("Calendar")
-        }
-    }
-}
-
-struct CompletedTasksView: View {
-    @Environment(\.modelContext) private var modelContext
-
-    @Query(
-        filter: #Predicate<Task> { $0.status == "Done" },
-        sort: \Task.createdAt,
-        order: .reverse
-    )
-    private var completedTasks: [Task]
-
-    var body: some View {
-        NavigationStack {
-            Group {
-                if completedTasks.isEmpty {
-                    ContentUnavailableView(
-                        "No completed tasks",
-                        systemImage: "checkmark.circle",
-                        description: Text("Tasks you mark as Done will appear here.")
-                    )
-                } else {
-                    List {
-                        ForEach(completedTasks) { task in
-                            TaskRowView(task: task)
-                        }
-                        .onDelete(perform: deleteTasks)
-                    }
-                    .listStyle(.plain)
-                }
-            }
-            .navigationTitle("Completed")
-        }
-    }
-
-    private func deleteTasks(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(completedTasks[index])
         }
     }
 }
