@@ -41,14 +41,10 @@ struct TaskListView: View {
                         }
                         .padding(.horizontal, 12)
                         .padding(.top, 12)
-                        .padding(.bottom, 94)
+                        .padding(.bottom, 20)
                     }
-
-                    bottomBar
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, 12)
                 }
-                .padding(.top, 18)
+                .padding(.top, 8)
                 .overlay(alignment: .leading) {
                     Rectangle()
                         .fill(shellBorderColor)
@@ -58,6 +54,13 @@ struct TaskListView: View {
                     Rectangle()
                         .fill(shellBorderColor)
                         .frame(width: 1)
+                }
+                .safeAreaInset(edge: .bottom) {
+                    bottomBar
+                        .padding(.horizontal, 8)
+                        .padding(.top, 6)
+                        .padding(.bottom, 6)
+                        .background(Color.clear)
                 }
             }
         }
@@ -159,6 +162,7 @@ struct TaskListView: View {
 
             TextField("Search...", text: $searchText)
                 .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(Color(red: 0.38, green: 0.44, blue: 0.54))
         }
