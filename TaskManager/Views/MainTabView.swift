@@ -21,7 +21,7 @@ struct MainTabView: View {
                 TaskListView()
                     .tag(Tab.tasks)
 
-                CalendarPlaceholderView()
+                CalendarView()
                     .tag(Tab.calendar)
 
                 ProfileView()
@@ -118,20 +118,6 @@ struct MainTabView: View {
             }
         }
         .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Calendar Placeholder
-private struct CalendarPlaceholderView: View {
-    var body: some View {
-        NavigationStack {
-            ContentUnavailableView(
-                "Calendar",
-                systemImage: "calendar",
-                description: Text("Calendar view coming soon.")
-            )
-            .navigationTitle("Calendar")
-        }
     }
 }
 
