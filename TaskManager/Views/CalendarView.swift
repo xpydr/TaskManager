@@ -354,6 +354,31 @@ struct CalendarView: View {
         )
     }
 
+    // MARK: - Helpers
+    // Get color based on task category
+    private func categoryColor(for task: Task) -> Color {
+        switch task.category.lowercased() {
+        case "work":     return .red
+        case "personal": return .purple
+        case "wishlist": return .orange
+        default:         return primaryBlue
+        }
+    }
+    
+    // Get month name from month number
+    private func monthName(_ month: Int) -> String {
+        let df = DateFormatter()
+        df.dateFormat = "MMMM"
+        var comps = DateComponents(); comps.month = month; comps.year = 2000
+        return df.string(from: Calendar.current.date(from: comps) ?? Date())
+    }
+
+    // MARK: - Preview
+    #Preview {
+        CalendarView()
+            .modelContainer(for: Task.self, inMemory: true)
+    }
+
 
 
 
