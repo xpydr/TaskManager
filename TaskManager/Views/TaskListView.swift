@@ -18,45 +18,47 @@ struct TaskListView: View {
     private let textGray = Color(red: 0.42, green: 0.42, blue: 0.42)
 
     var body: some View {
-        GeometryReader { geometry in
-            let metrics = LayoutMetrics(width: geometry.size.width)
+        NavigationStack {
+            GeometryReader { geometry in
+                let metrics = LayoutMetrics(width: geometry.size.width)
 
-            ZStack {
-                backgroundColor.ignoresSafeArea()
+                ZStack {
+                    backgroundColor.ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    ScrollView(showsIndicators: false) {
-                        VStack(spacing: 10) {
-                            profileHeader(metrics: metrics)
-                            searchBar(metrics: metrics)
-                            filterBar(metrics: metrics)
+                    VStack(spacing: 0) {
+                        ScrollView(showsIndicators: false) {
+                            VStack(spacing: 10) {
+                                profileHeader(metrics: metrics)
+                                searchBar(metrics: metrics)
+                                filterBar(metrics: metrics)
 
-                            Divider()
-                                .background(Color(red: 0.75, green: 0.82, blue: 0.94))
-                                .padding(.top, 9)
+                                Divider()
+                                    .background(Color(red: 0.75, green: 0.82, blue: 0.94))
+                                    .padding(.top, 9)
 
-                            sectionView(title: "Today", tasks: todayTasks, metrics: metrics)
-                            weekSection(metrics: metrics)
-                            completedSection(metrics: metrics)
+                                sectionView(title: "Today", tasks: todayTasks, metrics: metrics)
+                                weekSection(metrics: metrics)
+                                completedSection(metrics: metrics)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.top, 12)
+                            .padding(.bottom, 20)
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.top, 12)
-                        .padding(.bottom, 20)
+                    }
+                    .padding(.top, 8)
+                    .overlay(alignment: .leading) {
+                        Rectangle()
+                            .fill(shellBorderColor)
+                            .frame(width: 1)
+                    }
+                    .overlay(alignment: .trailing) {
+                        Rectangle()
+                            .fill(shellBorderColor)
+                            .frame(width: 1)
                     }
                 }
-                .padding(.top, 8)
-                .overlay(alignment: .leading) {
-                    Rectangle()
-                        .fill(shellBorderColor)
-                        .frame(width: 1)
-                }
-                .overlay(alignment: .trailing) {
-                    Rectangle()
-                        .fill(shellBorderColor)
-                        .frame(width: 1)
-                }
             }
-        }
+        }    
     }
 
     private var filteredTasks: [Task] {
@@ -215,14 +217,17 @@ struct TaskListView: View {
                         .padding(.vertical, 8)
                 } else {
                     ForEach(tasks) { task in
-                        TaskCardRow(task: task, isCompletedStyle: false)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    modelContext.delete(task)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+                        NavigationLink(destination: TaskDetailView(task: task)) {
+                            TaskCardRow(task: task, isCompletedStyle: false)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(task)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
+                        }
                     }
                 }
             }
@@ -258,7 +263,10 @@ struct TaskListView: View {
                         .padding(.vertical, 8)
                 } else {
                     ForEach(upcomingTasks) { task in
-                        TaskCardRow(task: task, isCompletedStyle: false)
+                        NavigationLink(destination: TaskDetailView(task: task)) {
+                            TaskCardRow(task: task, isCompletedStyle: false)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -294,14 +302,17 @@ struct TaskListView: View {
                         .padding(.vertical, 8)
                 } else {
                     ForEach(completedTasks.prefix(2)) { task in
-                        TaskCardRow(task: task, isCompletedStyle: true)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    modelContext.delete(task)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+                        NavigationLink(destination: TaskDetailView(task: task)) {
+                            TaskCardRow(task: task, isCompletedStyle: true)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(task)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
+                        }
                     }
                 }
             }
