@@ -116,5 +116,27 @@ struct EditTaskView: View {
         }
     }
 
-
+    // Function for creating labeled sections in the form
+    private func fieldSection<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(textGray)
+            content()
+        }
+    }
+    
+    // Function for creating pill buttons for category and status selection
+    private func pillButton(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(isSelected ? primaryBlue : Color.white)
+                .foregroundStyle(isSelected ? Color.white : Color.primary)
+                .clipShape(Capsule())
+                .overlay(Capsule().stroke(isSelected ? Color.clear : outlineColor, lineWidth: 1))
+        }
+    }
 }
