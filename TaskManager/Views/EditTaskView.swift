@@ -116,6 +116,7 @@ struct EditTaskView: View {
         }
     }
 
+    // MARK: - Helpers
     // Function for creating labeled sections in the form
     private func fieldSection<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -143,7 +144,19 @@ struct EditTaskView: View {
 
 // MARK: - Preview
 #Preview {
-    EditTaskView(task: Task(title: "Example Task", notes: "This is an example task for previewing the EditTaskView.", dueDate: Date().addingTimeInterval(3600), status: "To Do", category: "Work"))
+    let config    = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Task.self, configurations: config)
+ 
+    let sample = Task(
+        title: "Medical Appointment",
+        category: "Personal",
+        status: "To Do",
+        dueDate: Calendar.current.date(bySettingHour: 13, minute: 0, second: 0,
+                                       of: Calendar.current.date(byAdding: .day, value: 2, to: Date())!)!,
+        notes: "yearly physical w/ Dr. Smith\nbring in current prescriptions"
+    )
+    container.mainContext.insert(sample)
+ 
+    return EditTaskView(task: sample)
+        .modelContainer(container)
 }
-
-// TODO: connect to TaskDetailView
