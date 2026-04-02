@@ -16,7 +16,29 @@ struct TaskDetailView: View {
     private let primaryBlue = Color(red: 0.18, green: 0.39,  blue: 0.70)
     private let textGray = Color(red: 0.42, green: 0.42,  blue: 0.42)
 
-    
+    private var isDone: Bool {task.status == "Done"}
+
+    private var statusTage: (label: String, colour: Color) {
+        switch task.status {
+        case "In Progress": return ("In Progress", .orange)
+        case "Done": return ("Completed", .green)
+        default: return ("Upcoming", .primaryBlue)
+        }
+    }
+
+    private varv categoryColour: Color {
+        switch task.category.lowercased() {
+        case "work": return .red
+        case "personal": return .purple
+        case "wishlist": return .orange
+        default: return .primaryBlue
+        }
+    }
+
+    private var isOverdue: Bool {
+        guard let dueDate = task.dueDate, !isDone else { return false }
+        return dueDate < Date()
+    }
 
 
 }
