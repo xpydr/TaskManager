@@ -140,3 +140,8 @@ struct EditTaskView: View {
         }
     }
 }
+
+// MARK: - Preview
+#Preview {
+    EditTaskView(task: Task(title: "Example Task", notes: "This is an example task for previewing the EditTaskView.", dueDate: Date().addingTimeInterval(3600), status: "To Do", category: "Work"))
+}
