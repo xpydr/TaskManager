@@ -41,7 +41,7 @@ struct TaskDetailView: View {
         return dueDate < Date()
     }
 
-    // MARK: - Body View Components
+    // MARK: - Body
     var body: some View {
         ZStack {
             backgroundColor.ignoresSafeArea()
