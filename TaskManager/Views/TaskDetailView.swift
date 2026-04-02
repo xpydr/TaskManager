@@ -202,9 +202,81 @@ struct TaskDetailView: View {
         )
     }
 
-    
+    // MARK: - Action Buttons
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+ 
+            // Mark as Done/Undo
+            Button {
+                withAnimation(.spring(duration: 0.3)) {
+                    task.status = isDone ? "To Do" : "Done"
+                }
+            } label: {
+                Text(isDone ? "Mark as To Do" : "Mark as Done")
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(isDone ? Color(red: 0.40, green: 0.60, blue: 0.50) : primaryBlue)
+                    )
+            }
+ 
+            // Delete + Archive row
+            HStack(spacing: 10) {
+                Button {
+                    showDeleteConfirm = true
+                } label: {
+                    Text("Delete Task")
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(primaryBlue)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.white.opacity(0.6))
+                                .overlay(RoundedRectangle(cornerRadius: 14).stroke(outlineColor, lineWidth: 1.5))
+                        )
+                }
+ 
+                Button {
+                    withAnimation(.spring(duration: 0.3)) {
+                        task.status = "Done"
+                    }
+                    dismiss()
+                } label: {
+                    Text("Archive")
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(primaryBlue)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color.white.opacity(0.6))
+                                .overlay(RoundedRectangle(cornerRadius: 14).stroke(outlineColor, lineWidth: 1.5))
+                        )
+                }
+            }
+        }
+    }   
+}
 
-
-
-
+// MARK: - Preview
+#Preview {
+    let config    = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Task.self, configurations: config)
+ 
+    let sample = Task(
+        title: "Medical Appointment",
+        category: "Personal",
+        status: "To Do",
+        dueDate: Calendar.current.date(bySettingHour: 13, minute: 0, second: 0,
+                                       of: Calendar.current.date(byAdding: .day, value: 2, to: Date())!)!,
+        notes: "yearly physical w/ Dr. Smith\nbring in current prescriptions\npark across the street due to construction\nask about dermatologist referral"
+    )
+    container.mainContext.insert(sample)
+ 
+    return TaskDetailView(task: sample)
+        .modelContainer(container)
 }
