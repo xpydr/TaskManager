@@ -78,7 +78,7 @@ struct CalendarView: View {
         }
     }
 
-    // Mark: - Body
+    // MARK: - Body
     var body: some View {
         NavigationStack {
             ZStack {
@@ -104,7 +104,7 @@ struct CalendarView: View {
         }
     }
 
-    // Mark: - Calendar Card
+    // MARK: - Calendar Card
     private var calendarCard: some View {
         VStack(spacing: 10) {
             monthHeader
@@ -119,7 +119,7 @@ struct CalendarView: View {
         )
     }
 
-    // Mark: - Month Header
+    // MARK: - Month Header
     private var monthHeader: some View {
         HStack(spacing: 8) {
             Button {
@@ -194,7 +194,7 @@ struct CalendarView: View {
         }
     }
 
-    // Mark: - Weekday Labels
+    // MARK: - Weekday Labels
     private var weekdayLabels: some View {
         HStack(spacing: 0) {
             ForEach(daySymbols, id: \.self) { symbol in
@@ -206,7 +206,7 @@ struct CalendarView: View {
         }
     }
 
-    // Mark: - Days Grid
+    // MARK: - Days Grid
     private var daysGrid: some View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
  
@@ -219,7 +219,142 @@ struct CalendarView: View {
                 }
             }
         }
-    }    
+    }
+
+    // MARK: - Day Cell
+    @ViewBuilder
+    private func dayCell(_ date: Date) -> some View {
+        let isToday    = calendar.isDateInToday(date)
+        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
+        let hasTask    = hasTasks(on: date)
+ 
+        Button {
+            selectedDate = date
+        } label: {
+            ZStack(alignment: .bottom) {
+                Text("\(calendar.component(.day, from: date))")
+                    .font(.system(size: 13, weight: isToday || isSelected ? .bold : .regular, design: .rounded))
+                    .foregroundStyle(
+                        isSelected ? .white :
+                        isToday    ? primaryBlue :
+                                     Color(red: 0.25, green: 0.27, blue: 0.32)
+                    )
+                    .frame(width: 34, height: 34)
+                    .background(
+                        Group {
+                            if isSelected {
+                                RoundedRectangle(cornerRadius: 10).fill(primaryBlue)
+                            } else if isToday {
+                                RoundedRectangle(cornerRadius: 10).fill(softBlue)
+                            } else {
+                                Color.clear
+                            }
+                        }
+                    )
+ 
+                // Task dot
+                if hasTask && !isSelected {
+                    Circle()
+                        .fill(primaryBlue.opacity(0.55))
+                        .frame(width: 4, height: 4)
+                        .offset(y: 2)
+                }
+            }
+            .frame(height: 38)
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Agenda Section
+    private var agendaSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(groupedUpcoming, id: \.label) { group in
+                agendaGroup(label: group.label, tasks: group.tasks)
+            }
+ 
+            if groupedUpcoming.isEmpty {
+                Text("No upcoming tasks")
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 20)
+            }
+        }
+    }
+ 
+    private func agendaGroup(label: String, tasks: [Task]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(textGray)
+ 
+            if tasks.isEmpty {
+                Text("No tasks due")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 6)
+            } else {
+                VStack(spacing: 6) {
+                    ForEach(tasks) { task in
+                        NavigationLink(destination: TaskDetailView(task: task)) {
+                            agendaRow(task: task)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+    }
+
+    private func agendaRow(task: Task) -> some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(task.status == "To Do" ? "Due" : task.status)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(primaryBlue.opacity(0.7))
+                if let due = task.dueDate {
+                    Text(due.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 10, weight: .regular, design: .rounded))
+                        .foregroundStyle(textGray)
+                }
+            }
+            .frame(width: 52, alignment: .leading)
+ 
+            Rectangle()
+                .fill(categoryColor(for: task))
+                .frame(width: 3)
+                .cornerRadius(2)
+ 
+            VStack(alignment: .leading, spacing: 2) {
+                Text(task.title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color(red: 0.18, green: 0.22, blue: 0.30))
+                    .lineLimit(1)
+ 
+                if let notes = task.notes, !notes.isEmpty {
+                    Text(notes.components(separatedBy: "\n").first ?? "")
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(textGray.opacity(0.8))
+                        .lineLimit(1)
+                }
+            }
+ 
+            Spacer()
+ 
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(outlineColor)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.85))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(outlineColor, lineWidth: 1))
+        )
+    }
+
+
 
 
 
