@@ -145,3 +145,5 @@ struct EditTaskView: View {
 #Preview {
     EditTaskView(task: Task(title: "Example Task", notes: "This is an example task for previewing the EditTaskView.", dueDate: Date().addingTimeInterval(3600), status: "To Do", category: "Work"))
 }
+
+// TODO: connect to TaskDetailView

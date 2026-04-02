@@ -378,9 +378,6 @@ struct CalendarView: View {
         CalendarView()
             .modelContainer(for: Task.self, inMemory: true)
     }
-
-
-
-
-
 }
+
+// TODO: add calendar to MainTabView
