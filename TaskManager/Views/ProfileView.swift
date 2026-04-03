@@ -5,18 +5,19 @@ struct ProfileView: View {
     
     @State private var showEditProfile = false
     
+    // Profile state
+    @State private var name: String = "John Doe"
+    @State private var email: String = "john@georgebrown.ca"
+    
     @Query(sort: \Task.createdAt, order: .reverse)
     private var tasks: [Task]
     
     private let backgroundColor = Color(red: 1.0, green: 0.988, blue: 0.953)
     private let outlineColor = Color(red: 0.84, green: 0.86, blue: 0.93)
-    private let shellBorderColor = Color(red: 0.93, green: 0.91, blue: 0.86)
     private let primaryBlue = Color(red: 0.18, green: 0.39, blue: 0.70)
-    private let softBlue = Color(red: 0.84, green: 0.91, blue: 1.00)
     private let textGray = Color(red: 0.42, green: 0.42, blue: 0.42)
     
     // Stats
-    
     var inProgressCount: Int {
         tasks.filter { $0.status == "In Progress" }.count
     }
@@ -64,11 +65,12 @@ struct ProfileView: View {
                                 }
                             )
                         
-                        Text("John Doe")
+                        // Dynamic values
+                        Text(name)
                             .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(primaryBlue)
                         
-                        Text("john@georgebrown.ca")
+                        Text(email)
                             .foregroundStyle(textGray)
                         
                         Button("Edit Profile") {
@@ -89,6 +91,7 @@ struct ProfileView: View {
                                 outlineColor: outlineColor,
                                 textGray: textGray
                             )
+                            
                             StatBox(
                                 number: "\(completedCount)",
                                 label: "Completed",
@@ -96,6 +99,7 @@ struct ProfileView: View {
                                 outlineColor: outlineColor,
                                 textGray: textGray
                             )
+                            
                             StatBox(
                                 number: "\(todoCount)",
                                 label: "To Do",
@@ -110,23 +114,20 @@ struct ProfileView: View {
                     
                     Spacer()
                 }
-           
             }
             .navigationTitle("Profile")
+            
+            // ✅ Pass binding correctly
             .sheet(isPresented: $showEditProfile) {
-                EditProfileView()
+                EditProfileView(name: $name, email: $email)
             }
-            .overlay(
-                RoundedRectangle(cornerRadius: 24)
-                    .stroke(Color.gray.opacity(0.3), lineWidth: 2)
-                    .padding(16)
-                 
-            )
         }
     }
 }
 
-// MARK: - Stat Box
+//////////////////////////////////////////////////////////
+// MARK: - StatBox (KEEP THIS IN SAME FILE)
+//////////////////////////////////////////////////////////
 
 struct StatBox: View {
     let number: String
@@ -194,11 +195,4 @@ struct StatBox: View {
                 )
         )
     }
-}
-
-// Preview
-
-#Preview {
-    ProfileView()
-        .modelContainer(for: Task.self, inMemory: true)
 }

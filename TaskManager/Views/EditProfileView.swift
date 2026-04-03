@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct EditProfileView: View {
-    
+    final
     @Environment(\.dismiss) private var dismiss
     
-    @State private var name: String = "John Doe"
-    @State private var email: String = "john@georgebrown.ca"
+    @Binding var name: String
+    @Binding var email: String
     
     private let backgroundColor = Color(red: 1.0, green: 0.988, blue: 0.953)
     private let outlineColor = Color(red: 0.84, green: 0.86, blue: 0.93)
@@ -20,7 +20,6 @@ struct EditProfileView: View {
                 
                 VStack(spacing: 20) {
                     
-                    // Profile Icon
                     Circle()
                         .fill(
                             LinearGradient(
@@ -33,20 +32,8 @@ struct EditProfileView: View {
                             )
                         )
                         .frame(width: 100, height: 100)
-                        .overlay(
-                            VStack(spacing: 6) {
-                                Circle()
-                                    .fill(Color(red: 0.12, green: 0.31, blue: 0.57))
-                                    .frame(width: 24, height: 24)
-                                
-                                Capsule()
-                                    .fill(Color(red: 0.12, green: 0.31, blue: 0.57))
-                                    .frame(width: 50, height: 24)
-                            }
-                        )
                         .padding(.top, 20)
                     
-                    // Name Field
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Name")
                             .font(.caption)
@@ -59,10 +46,10 @@ struct EditProfileView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(outlineColor, lineWidth: 1)
+                                    .allowsHitTesting(false)
                             )
                     }
                     
-                    // Email Field
                     VStack(alignment: .leading, spacing: 6) {
                         Text("Email")
                             .font(.caption)
@@ -81,7 +68,6 @@ struct EditProfileView: View {
                     
                     Spacer()
                     
-                    // Save Button
                     Button("Save") {
                         dismiss()
                     }
@@ -110,5 +96,8 @@ struct EditProfileView: View {
 }
 
 #Preview {
-    EditProfileView()
+    EditProfileView(
+        name: .constant("John Doe"),
+        email: .constant("john@georgebrown.ca")
+    )
 }
