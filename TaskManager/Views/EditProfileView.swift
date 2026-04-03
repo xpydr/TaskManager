@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EditProfileView: View {
-    final
+    
     @Environment(\.dismiss) private var dismiss
     
     @Binding var name: String
