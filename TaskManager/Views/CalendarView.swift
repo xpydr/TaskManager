@@ -2,32 +2,32 @@ import SwiftUI
 import SwiftData
 
 struct CalendarView: View {
-
+    
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Task.dueDate) private var tasks: [Task]
- 
+    
     @State private var selectedDate: Date = Date()
     @State private var displayedMonth: Date = Date()
- 
+    
     private let backgroundColor  = Color(red: 1.0,  green: 0.988, blue: 0.953)
     private let outlineColor     = Color(red: 0.84, green: 0.86,  blue: 0.93)
     private let shellBorderColor = Color(red: 0.93, green: 0.91,  blue: 0.86)
     private let primaryBlue      = Color(red: 0.18, green: 0.39,  blue: 0.70)
     private let softBlue         = Color(red: 0.84, green: 0.91,  blue: 1.00)
     private let textGray         = Color(red: 0.42, green: 0.42,  blue: 0.42)
- 
+    
     private let calendar = Calendar.current
     private let daySymbols = Calendar.current.veryShortWeekdaySymbols
-
+    
     // MARK: - Computed Properties
     // Get all days to display in the calendar grid for the current month
     private var monthDays: [Date?] {
         guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth)),
               let range = calendar.range(of: .day, in: .month, for: monthStart) else { return [] }
- 
+        
         let firstWeekday = calendar.component(.weekday, from: monthStart)
         let leadingBlanks = (firstWeekday - calendar.firstWeekday + 7) % 7
- 
+        
         var days: [Date?] = Array(repeating: nil, count: leadingBlanks)
         for day in range {
             if let date = calendar.date(byAdding: .day, value: day - 1, to: monthStart) {
@@ -38,7 +38,7 @@ struct CalendarView: View {
         while days.count % 7 != 0 { days.append(nil) }
         return days
     }
-
+    
     // Get tasks for a specific date, excluding completed ones
     private func tasks(for date: Date) -> [Task] {
         tasks.filter { task in
@@ -46,7 +46,7 @@ struct CalendarView: View {
             return calendar.isDate(due, inSameDayAs: date)
         }
     }
- 
+    
     // Get tasks for the selected date, sorted by due time
     private var selectedDateTasks: [Task] {
         tasks(for: selectedDate).sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
@@ -59,7 +59,7 @@ struct CalendarView: View {
             return calendar.isDate(due, inSameDayAs: date)
         }
     }
- 
+    
     // Group upcoming incomplete tasks by day label
     private var groupedUpcoming: [(label: String, tasks: [Task])] {
         let upcoming = tasks.filter { task in
@@ -77,13 +77,13 @@ struct CalendarView: View {
             return (label: label, tasks: grouped[date]!.sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) })
         }
     }
-
+    
     // MARK: - Body
     var body: some View {
         NavigationStack {
             ZStack {
                 backgroundColor.ignoresSafeArea()
- 
+                
                 VStack(spacing: 0) {
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 14) {
@@ -103,7 +103,7 @@ struct CalendarView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
     }
-
+    
     // MARK: - Calendar Card
     private var calendarCard: some View {
         VStack(spacing: 10) {
@@ -118,7 +118,7 @@ struct CalendarView: View {
                 .overlay(RoundedRectangle(cornerRadius: 18).stroke(outlineColor, lineWidth: 1))
         )
     }
-
+    
     // MARK: - Month Header
     private var monthHeader: some View {
         HStack(spacing: 8) {
@@ -132,7 +132,7 @@ struct CalendarView: View {
                     .background(softBlue.opacity(0.5))
                     .clipShape(Circle())
             }
- 
+            
             // Month picker
             Menu {
                 ForEach(0..<12, id: \.self) { monthIndex in
@@ -156,7 +156,7 @@ struct CalendarView: View {
                         .foregroundStyle(primaryBlue)
                 }
             }
- 
+            
             // Year picker
             Menu {
                 ForEach((2020...2030).reversed(), id: \.self) { year in
@@ -178,9 +178,9 @@ struct CalendarView: View {
                         .foregroundStyle(primaryBlue)
                 }
             }
- 
+            
             Spacer()
- 
+            
             Button {
                 displayedMonth = calendar.date(byAdding: .month, value: 1, to: displayedMonth) ?? displayedMonth
             } label: {
@@ -193,7 +193,7 @@ struct CalendarView: View {
             }
         }
     }
-
+    
     // MARK: - Weekday Labels
     private var weekdayLabels: some View {
         HStack(spacing: 0) {
@@ -205,11 +205,11 @@ struct CalendarView: View {
             }
         }
     }
-
+    
     // MARK: - Days Grid
     private var daysGrid: some View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
- 
+        
         return LazyVGrid(columns: columns, spacing: 6) {
             ForEach(Array(monthDays.enumerated()), id: \.offset) { _, date in
                 if let date {
@@ -220,14 +220,14 @@ struct CalendarView: View {
             }
         }
     }
-
+    
     // MARK: - Day Cell
     @ViewBuilder
     private func dayCell(_ date: Date) -> some View {
         let isToday    = calendar.isDateInToday(date)
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let hasTask    = hasTasks(on: date)
- 
+        
         Button {
             selectedDate = date
         } label: {
@@ -236,8 +236,8 @@ struct CalendarView: View {
                     .font(.system(size: 13, weight: isToday || isSelected ? .bold : .regular, design: .rounded))
                     .foregroundStyle(
                         isSelected ? .white :
-                        isToday    ? primaryBlue :
-                                     Color(red: 0.25, green: 0.27, blue: 0.32)
+                            isToday    ? primaryBlue :
+                            Color(red: 0.25, green: 0.27, blue: 0.32)
                     )
                     .frame(width: 34, height: 34)
                     .background(
@@ -251,7 +251,7 @@ struct CalendarView: View {
                             }
                         }
                     )
- 
+                
                 // Task dot
                 if hasTask && !isSelected {
                     Circle()
@@ -264,14 +264,14 @@ struct CalendarView: View {
         }
         .buttonStyle(.plain)
     }
-
+    
     // MARK: - Agenda Section
     private var agendaSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             ForEach(groupedUpcoming, id: \.label) { group in
                 agendaGroup(label: group.label, tasks: group.tasks)
             }
- 
+            
             if groupedUpcoming.isEmpty {
                 Text("No upcoming tasks")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
@@ -281,13 +281,13 @@ struct CalendarView: View {
             }
         }
     }
- 
+    
     private func agendaGroup(label: String, tasks: [Task]) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
                 .font(.system(size: 16, weight: .bold, design: .rounded))
                 .foregroundStyle(textGray)
- 
+            
             if tasks.isEmpty {
                 Text("No tasks due")
                     .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -305,7 +305,7 @@ struct CalendarView: View {
             }
         }
     }
-
+    
     private func agendaRow(task: Task) -> some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
@@ -319,18 +319,18 @@ struct CalendarView: View {
                 }
             }
             .frame(width: 52, alignment: .leading)
- 
+            
             Rectangle()
                 .fill(categoryColor(for: task))
                 .frame(width: 3)
                 .cornerRadius(2)
- 
+            
             VStack(alignment: .leading, spacing: 2) {
                 Text(task.title)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(Color(red: 0.18, green: 0.22, blue: 0.30))
                     .lineLimit(1)
- 
+                
                 if let notes = task.notes, !notes.isEmpty {
                     Text(notes.components(separatedBy: "\n").first ?? "")
                         .font(.system(size: 11, weight: .regular, design: .rounded))
@@ -338,9 +338,9 @@ struct CalendarView: View {
                         .lineLimit(1)
                 }
             }
- 
+            
             Spacer()
- 
+            
             Image(systemName: "chevron.right")
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(outlineColor)
@@ -353,7 +353,7 @@ struct CalendarView: View {
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(outlineColor, lineWidth: 1))
         )
     }
-
+    
     // MARK: - Helpers
     // Get color based on task category
     private func categoryColor(for task: Task) -> Color {
@@ -372,10 +372,10 @@ struct CalendarView: View {
         var comps = DateComponents(); comps.month = month; comps.year = 2000
         return df.string(from: Calendar.current.date(from: comps) ?? Date())
     }
+}
 
-    // MARK: - Preview
-    #Preview {
-        CalendarView()
-            .modelContainer(for: Task.self, inMemory: true)
-    }
+// MARK: - Preview
+#Preview {
+    CalendarView()
+        .modelContainer(for: Task.self, inMemory: true)
 }
