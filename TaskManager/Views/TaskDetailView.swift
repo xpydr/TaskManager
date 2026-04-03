@@ -19,11 +19,11 @@ struct TaskDetailView: View {
     // MARK: - Helpers
     private var isDone: Bool {task.status == "Done"}
 
-    private var statusTage: (label: String, color: Color) {
+    private var statusTag: (label: String, color: Color) {
         switch task.status {
         case "In Progress": return ("In Progress", .orange)
         case "Done": return ("Completed", .green)
-        default: return ("Upcoming", .primaryBlue)
+        default: return ("Upcoming", primaryBlue)
         }
     }
 
@@ -32,7 +32,7 @@ struct TaskDetailView: View {
         case "work": return .red
         case "personal": return .purple
         case "wishlist": return .orange
-        default: return .primaryBlue
+        default: return primaryBlue
         }
     }
 
