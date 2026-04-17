@@ -49,7 +49,58 @@ struct DayDetailView: View {
     }
 
     // MARK: - Task List
+    private var taskList: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 10) {
+ 
+                // Date banner
+                dateBanner
+ 
+                // Tasks
+                VStack(spacing: 8) {
+                    ForEach(dayTasks) { task in
+                        NavigationLink(destination: TaskDetailView(task: task)) {
+                            DayTaskRow(task: task)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                modelContext.delete(task)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 18)
+                        .fill(Color.white.opacity(0.4))
+                        .overlay(RoundedRectangle(cornerRadius: 18).stroke(outlineColor, lineWidth: 1))
+                )
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 14)
+            .padding(.bottom, 40)
+        }
+    }
+
+    // MARK: - Date Banner
+
+    // MARK: - Empty State
+
 
 
 
 }
+
+
+// MARK: - Day Task Row
+private struct DayTaskRow: View {
+
+
+
+
+}
+
+// MARK: - Previews

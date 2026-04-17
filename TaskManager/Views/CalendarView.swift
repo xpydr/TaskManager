@@ -6,7 +6,6 @@ struct CalendarView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Task.dueDate) private var tasks: [Task]
     
-    @State private var selectedDate: Date = Date()
     @State private var displayedMonth: Date = Date()
     
     private let backgroundColor  = Color(red: 1.0,  green: 0.988, blue: 0.953)
