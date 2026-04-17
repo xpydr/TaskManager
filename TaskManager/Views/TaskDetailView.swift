@@ -281,4 +281,3 @@ struct TaskDetailView: View {
         .modelContainer(container)
 }
 
-// TODO: connect to TaskListView
