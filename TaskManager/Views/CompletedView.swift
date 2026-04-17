@@ -6,15 +6,42 @@ struct CompletedView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Task.createdAt, order: .reverse)
     private var tasks: [Task]
-
+    
+    @State private var showClearAlert = false
+    
     private let backgroundColor = Color(red: 1.0, green: 0.988, blue: 0.953)
     private let outlineColor = Color(red: 0.84, green: 0.86, blue: 0.93)
     private let shellBorderColor = Color(red: 0.93, green: 0.91, blue: 0.86)
-    private let primaryBlue = Color(red: 0.18, green: 0.39, blue: 0.70)
-    private let textGray = Color(red: 0.42, green: 0.42, blue: 0.42)
     
     private var completedTasks: [Task] {
-        tasks.filter { $0.status == "Done" }
+        tasks.filter { isCompleted($0) }
+    }
+    
+    private func isCompleted(_ task: Task) -> Bool {
+        let status = task.status
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        return status == "done" || status == "completed"
+    }
+    
+    // MARK: - Actions
+    
+    private func clearCompleted() {
+        for task in completedTasks {
+            modelContext.delete(task)
+        }
+        try? modelContext.save()
+    }
+    
+    private func reopen(_ task: Task) {
+        task.status = "Active"
+        try? modelContext.save()
+    }
+    
+    private func delete(_ task: Task) {
+        modelContext.delete(task)
+        try? modelContext.save()
     }
     
     var body: some View {
@@ -27,7 +54,20 @@ struct CompletedView: View {
                     
                     ScrollView {
                         VStack(spacing: 12) {
-                          
+                            
+                            // Clear button under title
+                            if !completedTasks.isEmpty {
+                                HStack {
+                                    Spacer()
+                                    Button("Clear") {
+                                        showClearAlert = true
+                                    }
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(.red)
+                                }
+                                .padding(.horizontal, 4)
+                            }
+                            
                             Divider()
                                 .background(outlineColor)
                             
@@ -41,14 +81,30 @@ struct CompletedView: View {
                                         .padding(.vertical, 12)
                                 } else {
                                     ForEach(completedTasks) { task in
-                                        CompletedTaskRow(task: task)
-                                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                                Button(role: .destructive) {
-                                                    modelContext.delete(task)
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
-                                                }
+                                        NavigationLink {
+                                            EditTaskView(task: task)
+                                        } label: {
+                                            CompletedTaskRow(task: task)
+                                        }
+                                        
+                                        // Reopen
+                                        .swipeActions(edge: .leading) {
+                                            Button {
+                                                reopen(task)
+                                            } label: {
+                                                Label("Reopen", systemImage: "arrow.uturn.backward")
                                             }
+                                            .tint(.blue)
+                                        }
+                                        
+                                        // Delete
+                                        .swipeActions(edge: .trailing) {
+                                            Button(role: .destructive) {
+                                                delete(task)
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -81,11 +137,19 @@ struct CompletedView: View {
                 }
             }
             .navigationTitle("Completed")
+            
+            // Confirmation alert
+            .alert("Clear all completed tasks?", isPresented: $showClearAlert) {
+                Button("Delete All", role: .destructive) {
+                    clearCompleted()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This action cannot be undone.")
+            }
         }
     }
 }
-
-// MARK: - Row
 
 struct CompletedTaskRow: View {
     
@@ -114,6 +178,7 @@ struct CompletedTaskRow: View {
             
             Spacer()
         }
+        .contentShape(Rectangle())
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(
@@ -126,8 +191,6 @@ struct CompletedTaskRow: View {
         )
     }
 }
-
-// Preview
 
 #Preview {
     CompletedView()
