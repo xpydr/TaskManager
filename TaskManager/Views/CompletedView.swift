@@ -25,8 +25,6 @@ struct CompletedView: View {
         return status == "done" || status == "completed"
     }
     
-    // MARK: - Actions
-    
     private func clearCompleted() {
         for task in completedTasks {
             modelContext.delete(task)
@@ -156,7 +154,18 @@ struct CompletedTaskRow: View {
     let task: Task
     
     private let primaryBlue = Color(red: 0.18, green: 0.39, blue: 0.70)
-    
+    private var categoryColor: Color {
+        switch task.category.lowercased() {
+        case "work":
+            return .red
+        case "personal":
+            return .purple
+        case "wishlist":
+            return .orange
+        default:
+            return .gray
+        }
+    }
     var body: some View {
         HStack(spacing: 10) {
             
@@ -177,6 +186,13 @@ struct CompletedTaskRow: View {
             }
             
             Spacer()
+            Text(task.category)
+                    .font(.system(size: 10, weight: .semibold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(categoryColor.opacity(0.15))
+                    .foregroundStyle(categoryColor)
+                    .clipShape(Capsule())
         }
         .contentShape(Rectangle())
         .padding(.horizontal, 10)
