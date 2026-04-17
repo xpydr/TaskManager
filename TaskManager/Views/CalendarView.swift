@@ -227,9 +227,7 @@ struct CalendarView: View {
         let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let hasTask    = hasTasks(on: date)
         
-        Button {
-            selectedDate = date
-        } label: {
+        NavigationLink(destination: DayDetailView(date: date)) {
             ZStack(alignment: .bottom) {
                 Text("\(calendar.component(.day, from: date))")
                     .font(.system(size: 13, weight: isToday || isSelected ? .bold : .regular, design: .rounded))
