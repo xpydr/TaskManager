@@ -97,28 +97,6 @@ struct AddTaskView: View {
                                                 .cornerRadius(metrics.pillCorner)
                                         }
                                     }
-                                    if isAddingCustomCategory {
-                                        HStack {
-                                            TextField("Custom category", text: $newCustomCategory)
-                                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                                .frame(width: 120)
-                                                .autocapitalization(.words)
-                                                .disableAutocorrection(true)
-                                            Button("Done") {
-                                                let trimmed = newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)
-                                                guard !trimmed.isEmpty, !categories.contains(trimmed), !customCategories.contains(trimmed) else { return }
-                                                customCategories.append(trimmed)
-                                                selectedCategory = trimmed
-                                                newCustomCategory = ""
-                                                isAddingCustomCategory = false
-                                            }
-                                            .disabled(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || categories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)) || customCategories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)))
-                                            Button("Cancel") {
-                                                newCustomCategory = ""
-                                                isAddingCustomCategory = false
-                                            }
-                                        }
-                                    }
                                 }
                                 
                                 // Status
@@ -212,6 +190,15 @@ struct AddTaskView: View {
                     }
                 }
                 .navigationBarHidden(true)
+                .sheet(isPresented: $isAddingCustomCategory) {
+                    NewCategorySheet(
+                        newCustomCategory: $newCustomCategory,
+                        isPresented: $isAddingCustomCategory,
+                        categories: categories,
+                        customCategories: $customCategories,
+                        selectedCategory: $selectedCategory
+                    )
+                }
             }
         }
         
@@ -309,10 +296,51 @@ struct StatusButton: View {
     }
 }
 
-// MARK: - Preview
+// MARK: - New Category Modal Sheet
 
-    #Preview {
-        AddTaskView()
-            .modelContainer(for: Task.self, inMemory: true)
+struct NewCategorySheet: View {
+    @Binding var newCustomCategory: String
+    @Binding var isPresented: Bool
+    let categories: [String]
+    @Binding var customCategories: [String]
+    @Binding var selectedCategory: String
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("New Category")) {
+                    TextField("Custom category", text: $newCustomCategory)
+                        .autocapitalization(.words)
+                        .disableAutocorrection(true)
+                }
+            }
+            .navigationTitle("Add Category")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        newCustomCategory = ""
+                        isPresented = false
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        let trimmed = newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !trimmed.isEmpty, !categories.contains(trimmed), !customCategories.contains(trimmed) else { return }
+                        customCategories.append(trimmed)
+                        selectedCategory = trimmed
+                        newCustomCategory = ""
+                        isPresented = false
+                    }
+                    .disabled(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || categories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)) || customCategories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)))
+                }
+            }
+        }
     }
+}
+
+// MARK: - Preview
+#Preview {
+    AddTaskView()
+        .modelContainer(for: Task.self, inMemory: true)
+}
 
