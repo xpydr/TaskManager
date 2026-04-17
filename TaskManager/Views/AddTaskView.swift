@@ -11,6 +11,10 @@ struct AddTaskView: View {
     @State private var dueDate: Date = Date()
     @State private var notes: String = ""
 
+    @State private var customCategories: [String] = []
+    @State private var isAddingCustomCategory: Bool = false
+    @State private var newCustomCategory: String = ""
+
     private var trimmedTitle: String {
         title.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -75,7 +79,14 @@ struct AddTaskView: View {
                                                 selectedCategory = category
                                             }
                                         }
-                                        Button(action: {}) {
+                                        ForEach(customCategories, id: \.self) { category in
+                                            CategoryButton(title: category, isSelected: selectedCategory == category, metrics: metrics) {
+                                                selectedCategory = category
+                                            }
+                                        }
+                                        Button(action: {
+                                            isAddingCustomCategory = true
+                                        }) {
                                             Text("+ New")
                                                 .font(.system(size: metrics.buttonLabelSize, weight: .medium, design: .rounded))
                                                 .fontWeight(.medium)
@@ -84,6 +95,28 @@ struct AddTaskView: View {
                                                 .background(Color.gray.opacity(0.15))
                                                 .foregroundColor(.secondary)
                                                 .cornerRadius(metrics.pillCorner)
+                                        }
+                                    }
+                                    if isAddingCustomCategory {
+                                        HStack {
+                                            TextField("Custom category", text: $newCustomCategory)
+                                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                                .frame(width: 120)
+                                                .autocapitalization(.words)
+                                                .disableAutocorrection(true)
+                                            Button("Done") {
+                                                let trimmed = newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)
+                                                guard !trimmed.isEmpty, !categories.contains(trimmed), !customCategories.contains(trimmed) else { return }
+                                                customCategories.append(trimmed)
+                                                selectedCategory = trimmed
+                                                newCustomCategory = ""
+                                                isAddingCustomCategory = false
+                                            }
+                                            .disabled(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || categories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)) || customCategories.contains(newCustomCategory.trimmingCharacters(in: .whitespacesAndNewlines)))
+                                            Button("Cancel") {
+                                                newCustomCategory = ""
+                                                isAddingCustomCategory = false
+                                            }
                                         }
                                     }
                                 }
