@@ -93,11 +93,6 @@ struct TaskDetailView: View {
                 .foregroundStyle(primaryBlue)
  
             Spacer()
- 
-            // Placeholder for spacing
-            Image(systemName: "line.3.horizontal")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(primaryBlue)
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
