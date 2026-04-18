@@ -86,9 +86,60 @@ struct DayDetailView: View {
     }
 
     // MARK: - Date Banner
+    private var dateBanner: some View {
+        HStack(spacing: 14) {
+            // Big day number
+            VStack(spacing: 0) {
+                Text(date.formatted(.dateTime.day()))
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .foregroundStyle(primaryBlue)
+                Text(date.formatted(.dateTime.month(.abbreviated)).uppercased())
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(primaryBlue.opacity(0.6))
+            }
+            .frame(width: 56, height: 56)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(red: 0.84, green: 0.91, blue: 1.0))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(outlineColor, lineWidth: 1))
+            )
+ 
+            VStack(alignment: .leading, spacing: 3) {
+                Text(date.formatted(.dateTime.weekday(.wide)))
+                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .foregroundStyle(primaryBlue)
+ 
+                Text("\(dayTasks.count) task\(dayTasks.count == 1 ? "" : "s") scheduled")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(textGray)
+            }
+ 
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.5))
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(outlineColor, lineWidth: 1))
+        )
+    }
 
     // MARK: - Empty State
-
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "calendar.badge.checkmark")
+                .font(.system(size: 44))
+                .foregroundStyle(primaryBlue.opacity(0.4))
+ 
+            Text("No tasks for this day")
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                .foregroundStyle(textGray)
+ 
+            Text(date.formatted(.dateTime.weekday(.wide).month(.wide).day().year()))
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(textGray.opacity(0.7))
+        }
+    }
 
 
 
