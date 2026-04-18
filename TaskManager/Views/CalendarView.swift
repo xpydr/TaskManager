@@ -46,11 +46,6 @@ struct CalendarView: View {
         }
     }
     
-    // Get tasks for the selected date, sorted by due time
-    private var selectedDateTasks: [Task] {
-        tasks(for: selectedDate).sorted { ($0.dueDate ?? .distantFuture) < ($1.dueDate ?? .distantFuture) }
-    }
-    
     // Check if there are any incomplete tasks on a given date
     private func hasTasks(on date: Date) -> Bool {
         tasks.contains { task in
@@ -224,24 +219,19 @@ struct CalendarView: View {
     @ViewBuilder
     private func dayCell(_ date: Date) -> some View {
         let isToday    = calendar.isDateInToday(date)
-        let isSelected = calendar.isDate(date, inSameDayAs: selectedDate)
         let hasTask    = hasTasks(on: date)
         
         NavigationLink(destination: DayDetailView(date: date)) {
             ZStack(alignment: .bottom) {
                 Text("\(calendar.component(.day, from: date))")
-                    .font(.system(size: 13, weight: isToday || isSelected ? .bold : .regular, design: .rounded))
+                    .font(.system(size: 13, weight: isToday ? .bold : .regular, design: .rounded))
                     .foregroundStyle(
-                        isSelected ? .white :
-                            isToday    ? primaryBlue :
-                            Color(red: 0.25, green: 0.27, blue: 0.32)
+                            isToday ? primaryBlue : Color(red: 0.25, green: 0.27, blue: 0.32)
                     )
                     .frame(width: 34, height: 34)
                     .background(
                         Group {
-                            if isSelected {
-                                RoundedRectangle(cornerRadius: 10).fill(primaryBlue)
-                            } else if isToday {
+                            if isToday {
                                 RoundedRectangle(cornerRadius: 10).fill(softBlue)
                             } else {
                                 Color.clear
@@ -250,7 +240,7 @@ struct CalendarView: View {
                     )
                 
                 // Task dot
-                if hasTask && !isSelected {
+                if hasTask {
                     Circle()
                         .fill(primaryBlue.opacity(0.55))
                         .frame(width: 4, height: 4)
@@ -374,5 +364,5 @@ struct CalendarView: View {
 // MARK: - Preview
 #Preview {
     CalendarView()
-        .modelContainer(for: Task.self, inMemory: true)
+        .modelContainer(for: Task.self)
 }

@@ -1,5 +1,5 @@
-SwiftUI
-SwiftData
+import SwiftUI
+import SwiftData
 
 struct DayDetailView: View {
 
@@ -27,7 +27,7 @@ struct DayDetailView: View {
     private var navTitle: String {
         if Calendar.current.isDateInToday(date) {return "Today"}
         if Calendar.current.isDateInTomorrow(date) {return "Tomorrow"}
-        if Calendar.current.isDateYesterday(date) {return "Yesterday"}
+        if Calendar.current.isDateInYesterday(date) {return "Yesterday"}
         return date.formatted(.dateTime.weekday(.wide).month(.wide).day())
     }
 
@@ -140,18 +140,90 @@ struct DayDetailView: View {
                 .foregroundStyle(textGray.opacity(0.7))
         }
     }
-
-
-
 }
-
 
 // MARK: - Day Task Row
 private struct DayTaskRow: View {
 
-
-
-
+    let task: Task
+ 
+    private let outlineColor = Color(red: 0.84, green: 0.86, blue: 0.93)
+    private let primaryBlue  = Color(red: 0.18, green: 0.39, blue: 0.70)
+    private let textGray     = Color(red: 0.42, green: 0.42, blue: 0.42)
+ 
+    private var accentColor: Color {
+        if task.status == "Done" { return primaryBlue }
+        switch task.category.lowercased() {
+        case "work":     return .red
+        case "personal": return .purple
+        case "wishlist": return .orange
+        default:         return primaryBlue
+        }
+    }
+ 
+    private var statusColor: Color {
+        switch task.status {
+        case "In Progress": return .orange
+        case "Done":        return .green
+        default:            return primaryBlue
+        }
+    }
+ 
+    var body: some View {
+        HStack(spacing: 10) {
+ 
+            // Colored left bar
+            Rectangle()
+                .fill(accentColor)
+                .frame(width: 3)
+                .cornerRadius(2)
+ 
+            VStack(alignment: .leading, spacing: 4) {
+                Text(task.title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(task.status == "Done" ? textGray : Color(red: 0.18, green: 0.22, blue: 0.30))
+                    .strikethrough(task.status == "Done")
+ 
+                HStack(spacing: 8) {
+                    if let due = task.dueDate {
+                        Label(due.formatted(date: .omitted, time: .shortened),
+                              systemImage: "clock")
+                            .font(.system(size: 11, weight: .regular, design: .rounded))
+                            .foregroundStyle(textGray.opacity(0.8))
+                    }
+ 
+                    // Status pill
+                    Text(task.status)
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(statusColor)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(statusColor.opacity(0.12))
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(statusColor.opacity(0.3), lineWidth: 1))
+                }
+            }
+ 
+            Spacer()
+ 
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(outlineColor)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.9))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(outlineColor, lineWidth: 1))
+        )
+    }
 }
 
-// MARK: - Previews
+// MARK: - Preview
+#Preview {
+    NavigationStack {
+        DayDetailView(date: Date())
+    }
+    .modelContainer(for: Task.self)
+}
